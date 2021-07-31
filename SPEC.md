@@ -1,4 +1,68 @@
+# REX File Format
+
+.rex (Rocket Executable) is a file format that defines a Rocket executable program.
+
+The files contains two major sections, the header and the body. The header contains information such as exported symbols, entry point offset, and how much memory the application may need to execute properly. The body contains the actual bytecode instructions.
+
+**Magic Bytes:**
+
+In order to define a proper REXecutable file, the first three bytes in the file must match the following magic bytes (to mark the file as a valid REX file):
+
+*Magic Bytes:* 52 45 58
+
+**Header Sections:**
+
+Here is a list (in order) of the sections in the header that you must fill in.
+
+* (u64) Entry Point Offset
+* (u64) Sizeof Symbols Section
+* ^ that many bytes after this will be the entire symbols section
+
+**Header Symbols:**
+
+To create a symbol, you must follow this format in the **symbols section** of the REX header.
+
+* (u8) Symbol Type
+* (u64) Hashed symbol name
+* (u64) Symbol Location Offset
+
+*Symbol Types:*
+
+| u8 id | Description      |
+| ----- | ---------------- |
+| 0     | i8               |
+| 1     | u8               |
+| 2     | i16              |
+| 3     | u16              |
+| 4     | i32              |
+| 5     | u32              |
+| 6     | i64              |
+| 7     | u64              |
+| 8     | f32              |
+| 9     | f64              |
+| 10    | ascii string     |
+| 11    | unicode string   |
+| 12    | label (function) |
+
+# Opcode Format
+
+Each opcode should be written as a **single unsigned byte**, and operands should match the size listed in the opcode table below.
+
+**Example RASM (Rocket Assembly):**
+
+MLR    0,    0
+
+**Example Hex:**
+
+0x0B    0x0    0x0000
+
+**Example Binary:**
+
+00001011 00000000 00000000 00000000 00000000 00000000
+
 # Instruction Set
+
+Opcode values (as bytes) starts at 0 with **NOP** and increases by **one** for every instruction on this list.
 
 | Opcode | Parameters                                | Description                                                           |
 | ------ | ----------------------------------------- | --------------------------------------------------------------------- |
