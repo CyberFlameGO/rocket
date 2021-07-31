@@ -8,7 +8,7 @@ A extremely minimal and efficient VM for programming languages. Rocket is design
 
 **VM Specification:**
 
-See [the specification](https://) for details.
+See [the specification](https://github.com/jet-lang/rocket/blob/main/SPEC.md) for details.
 
 **Planned Features:**
 
