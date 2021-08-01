@@ -22,7 +22,6 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
 typedef unsigned long u64;
-typedef int rocket_result_t;
 typedef unsigned char opcode_t;
 
 /* Opcodes (see SPEC.md for specifications) */
@@ -75,20 +74,84 @@ enum
 	OP_LDI64,
 	OP_LDU64,
 	OP_LDF32,
-	OP_LDF64
+	OP_LDF64,
+	OP_UNKNOWN,
+	OP_INVALID
 };
 
 /* Types */
+typedef struct rocket_symbol
+{
+	u8 type;
+	u64 hash;
+	u64 offset;
+};
+
+typedef struct rocket_app
+{
+	struct rocket_app_header
+	{
+		u64 entry_point;
+		u64 symbol_count;
+		rocket_symbol *symbols;
+	} header;
+
+	struct rocket_app_body
+	{
+		u64 size;
+		u8 *code;
+	} body;
+} rocket_app_t;
+
 typedef struct rocket_vm
 {
 	u8 *code;
+	u64 *stack;
+	u64 *locals;
+	u64 *callstack;
 	u64 registers[16];
-	u64 *stack, locals, callstack;
 } rocket_vm_t;
 
 /* Functions */
+
+/*
+ * Create and initialize a VM
+ *
+ * @returns A pointer to a VM object
+ */
 rocket_vm_t *rocket_create_vm(u8 *code, size_t stack_size, size_t max_memory);
+
+/*
+ * Destroy and cleanup a VM
+ */
 void rocket_destroy_vm(rocket_vm_t *vm);
-rocket_result_t rocket_execute(rocket_vm_t *vm);
+
+/*
+ * Load app data into app structure
+ *
+ * @returns App data structure
+ */
+rocket_app_t rocket_load_app(u8 *file_data);
+
+/*
+ * Load app data into vm
+ *
+ * @returns Result boolean
+ */
+int rocket_load_data(rocket_vm_t *vm, rocket_app_t *app);
+
+/*
+ * Fetch data from the program
+ *
+ * @returns A pointer to the data
+ */
+void *rocket_fetch(rocket_vm_t *vm, size_t size);
+
+/*
+ * Execute a step of the program
+ *
+ * @returns The opcode value that was executed
+ */
+opcode_t rocket_step(rocket_vm_t *vm);
 
 #endif /* ROCKET_H */
